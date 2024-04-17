@@ -16,7 +16,7 @@ class FilesUtil {
     return File('$path/messages.txt');
   }
 
-  Future<String> readCounter() async {
+  Future<String> readFile() async {
     try {
       final file = await _localFile;
       return await file.readAsString();
