@@ -45,6 +45,8 @@ dependencies:
     git:
       url: https://github.com/maplibre/flutter-maplibre-gl.git
       ref: main
+  aws_client: ^0.4.2
+  google_sign_in: ^5.2.1
   
 dev_dependencies:
   flutter_test:

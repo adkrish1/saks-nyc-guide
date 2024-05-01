@@ -4,6 +4,7 @@ import '../pages/maps.dart';
 import '../pages/itinerary.dart';
 import '../pages/chatbot.dart';
 import '../pages/settings.dart';
+import '../pages/login.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -35,9 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   final _pageOptions = [
     const MapsPage(),
-    const ItineraryPage(),
+    const LoginPage(),
     const ChatBotPage(),
-    const SettingsPage()
+    SettingsPage()
   ];
 
   @override

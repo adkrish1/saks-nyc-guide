@@ -2,27 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  SettingsPage({super.key});
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  void handleSignOut() async {
+    await _googleSignIn.signOut();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
             child: ListView(
-      children: const <Widget>[
-        ListTile(
+      children: <Widget>[
+        const ListTile(
           title: Text('Info'),
           dense: true,
         ),
-        ListTile(
+        const ListTile(
           title: Text('Clear Chats'),
           onTap: clearChats,
           dense: true,
         ),
         ListTile(
-          title: Text('Logout'),
+          title: const Text('Logout'),
+          onTap: handleSignOut,
           dense: true,
         ),
       ],
