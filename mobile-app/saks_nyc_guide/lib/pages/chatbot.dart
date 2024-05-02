@@ -4,6 +4,8 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:saks_nyc_guide/utils/messages_util.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -21,6 +23,10 @@ class _ChatPageState extends State<ChatBotPage> {
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
   );
 
+  final _bot = const types.User(
+    id: 'bot_id',
+  );
+
   dynamic database;
 
   Future<void> createDB() async {
@@ -35,16 +41,81 @@ class _ChatPageState extends State<ChatBotPage> {
     );
   }
 
+  Future<void> _fetchData(message) async {
+    print("Message is: " + message);
+    final Uri uri = Uri.parse(
+        'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/beta/chatbot');
+    final Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      // Add any additional headers if needed
+    };
+    final Map<String, dynamic> requestBody = {
+      "messages": [
+        {"text": message}
+      ]
+    };
+
+    final http.Response response = await http.post(
+      uri,
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+      // You can handle the response data here as needed
+      try {
+        // Parse the JSON response
+        final Map<String, dynamic> parsedResponse = jsonDecode(response.body);
+
+        // Access the value of messages.content
+        final String messagesContent =
+            parsedResponse['body-json']['messages'][0]['content'];
+
+        // Print the value
+        print(messagesContent); // Output: Please enter a valid input
+        final textMessage = types.TextMessage(
+          author: _bot,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+          id: const Uuid().v4(),
+          text: messagesContent,
+        );
+        setState(() {
+          _messages.insert(0, textMessage);
+        });
+
+        await database.then((d) {
+          d.insert(
+              "messages",
+              ChatMessage(
+                      author: _bot,
+                      createdAt: textMessage.createdAt,
+                      id: textMessage.id,
+                      messageText: textMessage.text)
+                  .toMap());
+        });
+      } catch (e) {
+        // Handle exceptions
+        print('Error: $e');
+      }
+    } else {
+      // If the server did not return a 200 OK response,
+      // throw an exception.
+      throw Exception('Failed to load data');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     createDB().then((value) => _loadMessages());
   }
 
-  void _addMessage(types.Message message) {
+  void _addMessage(types.Message message, String messageText) {
     setState(() {
       _messages.insert(0, message);
     });
+    _fetchData(messageText);
   }
 
   void _handleSendPressed(types.PartialText message) async {
@@ -66,7 +137,7 @@ class _ChatPageState extends State<ChatBotPage> {
               .toMap());
     });
 
-    _addMessage(textMessage);
+    _addMessage(textMessage, message.text.toString());
   }
 
   void _loadMessages() async {
