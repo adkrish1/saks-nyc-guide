@@ -47,6 +47,10 @@ dependencies:
       ref: main
   aws_client: ^0.4.2
   google_sign_in: ^5.2.1
+  amplify_api: ^1.0.0
+  amplify_auth_cognito: ^1.0.0
+  amplify_authenticator: ^1.0.0
+  amplify_flutter: ^1.0.0
   
 dev_dependencies:
   flutter_test:
