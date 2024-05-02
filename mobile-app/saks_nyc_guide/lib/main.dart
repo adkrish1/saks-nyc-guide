@@ -1,17 +1,45 @@
 import 'package:flutter/material.dart';
 import 'home/home.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_authenticator/amplify_authenticator.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'amplifyconfiguration.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    home: MyStatefulWidget(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyStatefulWidget extends StatefulWidget {
+  const MyStatefulWidget({super.key});
 
-  // This widget is the root of your application.
+  @override
+  MyStatefulWidgetState createState() => MyStatefulWidgetState();
+}
+
+class MyStatefulWidgetState extends State<MyStatefulWidget> {
+  @override
+  void initState() {
+    super.initState();
+    _configureAmplify();
+  }
+
+  void _configureAmplify() async {
+    try {
+      await Amplify.addPlugin(AmplifyAuthCognito());
+      await Amplify.configure(amplifyconfig);
+      safePrint('Successfully configured');
+    } on Exception catch (e) {
+      safePrint('Error configuring Amplify: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return Authenticator(
+        child: MaterialApp(
+      builder: Authenticator.builder(),
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -37,7 +65,6 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'SAKS New York Guide'),
-    );
+    ));
   }
 }
-
