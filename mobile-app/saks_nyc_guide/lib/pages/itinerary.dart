@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ItineraryPage extends StatelessWidget {
-	const ItineraryPage({super.key});
+class Itinerary extends StatefulWidget {
+  const Itinerary({Key? key}) : super(key: key);
 
-	@override
-	Widget build(BuildContext context) {
-		return const Scaffold(
-			body: Center(
-			child: Column(
-				mainAxisAlignment: MainAxisAlignment.center,
-				children: <Widget>[
-					Text(
-						'You have pushed the button this many times:',
-					),
-				],
-			),
-		));
-	}
+  @override
+  ItineraryState createState() => ItineraryState();
+}
+
+class ItineraryState extends State<Itinerary> {
+  @override
+  Widget build(BuildContext context) {
+    return Placeholder();
+  }
 }
