@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutter/rendering.dart';
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
@@ -90,7 +92,50 @@ class MapState extends State<Map> {
           cameraTargetBounds: CameraTargetBounds(LatLngBounds(
               northeast: const LatLng(40.800875, -73.914747),
               southwest: const LatLng(40.701539, -74.023967)))),
-      FloatingActionButton(onPressed: _addMarkers),
+      Positioned(
+          bottom: 20,
+          right: 20,
+          child: SpeedDial(
+            animatedIcon: AnimatedIcons.menu_close,
+            animatedIconTheme: IconThemeData(size: 28.0),
+            backgroundColor: Colors.green[900],
+            childrenButtonSize: const Size(60.0, 60.0),
+            visible: true,
+            curve: Curves.bounceInOut,
+            children: [
+              SpeedDialChild(
+                child: const Icon(Icons.wc_rounded, color: Colors.white),
+                backgroundColor: Colors.green,
+                onTap: () => print('Pressed Restrooms'),
+                label: 'Restrooms',
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelBackgroundColor: Colors.black,
+                shape: const CircleBorder(),
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.local_police_outlined, color: Colors.white),
+                backgroundColor: Colors.green,
+                onTap: () => print('Pressed Police'),
+                label: 'Police',
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelBackgroundColor: Colors.black,
+                shape: const CircleBorder(),
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.train_outlined, color: Colors.white),
+                backgroundColor: Colors.green,
+                onTap: () => print('Pressed Subway'),
+                label: 'Subway',
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelBackgroundColor: Colors.black,
+                shape: const CircleBorder(),
+              ),
+            ],
+          ))
+      // FloatingActionButton(onPressed: _addMarkers),
     ]));
   }
 }
