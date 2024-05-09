@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:flutter/rendering.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
@@ -17,18 +19,18 @@ class MapsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Map();
+    return const Maps();
   }
 }
 
-class Map extends StatefulWidget {
-  const Map({super.key});
+class Maps extends StatefulWidget {
+  const Maps({super.key});
 
   @override
   State createState() => MapState();
 }
 
-class MapState extends State<Map> {
+class MapState extends State<Maps> {
   MaplibreMapController? controller;
 
   void _onMapCreated(MaplibreMapController controller) {
@@ -37,19 +39,47 @@ class MapState extends State<Map> {
 
   bool _isPresent = true;
 
-  void _addMarkers() {
-    _isPresent = !_isPresent;
-    if (_isPresent) {
-      controller!.clearCircles();
-      controller!.clearSymbols();
+  Future<void> _fetchData(String type) async {
+    
+    controller!.clearSymbols();
+
+    final Uri uri = Uri.parse('https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v2/location_data?location_type=${type}');
+
+    final http.Response response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      try {
+        // Parse the JSON response
+        List<dynamic> res = jsonDecode(response.body);
+        for (var element in res) {
+          _addCustomMarker("locationPin", LatLng(double.parse(element['Latitude']), double.parse(element['Longitude'])));
+        }
+        
+      } catch (e) {
+        print('Error: $e');
+      }
     } else {
-      controller!.addSymbol(_getSymbolOptions("locationPin"));
-      controller!.addCircle(
-        const CircleOptions(
-            geometry: LatLng(40.776676, -73.971321), circleColor: "#FF0000"),
-      );
+      throw Exception('Failed to load data');
     }
   }
+
+  void _addCustomMarker(String iconType, LatLng latLng) {
+    controller!.addSymbol(_getSymbolOptions(iconType, latLng));
+  }
+
+  // void _addMarkers() {
+  //   _isPresent = !_isPresent;
+  //   if (_isPresent) {
+  //     controller!.clearCircles();
+  //     controller!.clearSymbols();
+  //   } else {
+  //     controller!.addSymbol(_getSymbolOptions("locationPin"));
+  //     controller!.addCircle(
+  //       const CircleOptions(
+  //           geometry: LatLng(40.776676, -73.971321), circleColor: "#FF0000"),
+  //     );
+  //   }
+  // }
 
   void _onStyleLoaded() {
     addImageFromAsset("locationPin", "assets/icons/location.png");
@@ -61,8 +91,8 @@ class MapState extends State<Map> {
     return controller!.addImage(name, list);
   }
 
-  SymbolOptions _getSymbolOptions(String iconImage) {
-    LatLng geometry = const LatLng(40.778321, -73.965444);
+  SymbolOptions _getSymbolOptions(String iconImage, LatLng latLng) {
+    LatLng geometry = latLng;
     return SymbolOptions(
       geometry: geometry,
       iconSize: 4.0,
@@ -116,7 +146,7 @@ class MapState extends State<Map> {
               SpeedDialChild(
                 child: const Icon(Icons.local_police_outlined, color: Colors.white),
                 backgroundColor: Colors.green,
-                onTap: () => print('Pressed Police'),
+                onTap: () => _fetchData("Precinct"),
                 label: 'Police',
                 labelStyle:
                     const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
@@ -126,7 +156,7 @@ class MapState extends State<Map> {
               SpeedDialChild(
                 child: const Icon(Icons.train_outlined, color: Colors.white),
                 backgroundColor: Colors.green,
-                onTap: () => print('Pressed Subway'),
+                onTap: () => _fetchData("Subway"),
                 label: 'Subway',
                 labelStyle:
                     const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
