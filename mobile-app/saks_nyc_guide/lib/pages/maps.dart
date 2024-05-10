@@ -5,6 +5,9 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
@@ -40,21 +43,29 @@ class MapState extends State<Maps> {
   bool _isPresent = true;
 
   Future<void> _fetchData(String type) async {
-    
+    AuthSession res = await Amplify.Auth.fetchAuthSession(
+      options: CognitoSessionOptions(getAWSCredentials: true),
+    );
+    final idToken = (res as CognitoAuthSession).userPoolTokens!.idToken;
+
     controller!.clearSymbols();
 
-    final Uri uri = Uri.parse('https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v2/location_data?location_type=${type}');
+    final Uri uri = Uri.parse(
+        'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v2/location_data?location_type=${type}');
 
-    final http.Response response = await http.get(uri);
+    final http.Response response =
+        await http.get(uri, headers: {"Authorization": idToken.raw});
 
     if (response.statusCode == 200) {
       try {
         // Parse the JSON response
         List<dynamic> res = jsonDecode(response.body);
         for (var element in res) {
-          _addCustomMarker("locationPin", LatLng(double.parse(element['Latitude']), double.parse(element['Longitude'])));
+          _addCustomMarker(
+              "locationPin",
+              LatLng(double.parse(element['Latitude']),
+                  double.parse(element['Longitude'])));
         }
-        
       } catch (e) {
         print('Error: $e');
       }
@@ -138,18 +149,19 @@ class MapState extends State<Maps> {
                 backgroundColor: Colors.green,
                 onTap: () => print('Pressed Restrooms'),
                 label: 'Restrooms',
-                labelStyle:
-                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.white),
                 labelBackgroundColor: Colors.black,
                 shape: const CircleBorder(),
               ),
               SpeedDialChild(
-                child: const Icon(Icons.local_police_outlined, color: Colors.white),
+                child: const Icon(Icons.local_police_outlined,
+                    color: Colors.white),
                 backgroundColor: Colors.green,
                 onTap: () => _fetchData("Precinct"),
                 label: 'Police',
-                labelStyle:
-                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.white),
                 labelBackgroundColor: Colors.black,
                 shape: const CircleBorder(),
               ),
@@ -158,8 +170,8 @@ class MapState extends State<Maps> {
                 backgroundColor: Colors.green,
                 onTap: () => _fetchData("Subway"),
                 label: 'Subway',
-                labelStyle:
-                    const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.white),
                 labelBackgroundColor: Colors.black,
                 shape: const CircleBorder(),
               ),
