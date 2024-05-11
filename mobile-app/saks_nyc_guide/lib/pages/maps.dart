@@ -8,12 +8,13 @@ import 'dart:convert';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:aws_client/location_2020_11_19.dart' as aws_location;
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
 const apiKey =
     "v1.public.eyJqdGkiOiJhZWZjNTBhZC0xZWYzLTQwNjItYmE4Zi1kMDdmZjE2YTlmNDYifTc9rXnLgDt7iwHSnuW4-jpUKi5le1OALtiZVKmpOmsrpINiWzQwIoyHeymAvsYmqWoRXkTZQnOOoUEE9VA8etS1WRVXfyTFHhX17XNXKbWp2DoTabdAhEq6AJ3RrAMsXfNZrM0QQlFTvBcepwV9CH2mU3q8vHSm10TyS7ThOAZtAmBckpyR55R0D4ae90chKbClyGubPcq52ixMjm-q21Cvgv5RjjkK1EzzUKXG3lH0AtmwnY1mTG1Dmlf4ZNSxBfGGuihdpkgQNCT0hoIAR7vkKQdbrAFOieyzOOnmYUo4Tz52gk5IGSxAztWAw6YaUPPkHgg_ElbePzorNo46I_g.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx";
-const mapName = "map-try-2";
+const mapName = "saks-map-1";
 const region = "us-east-1";
 // enum OfflineDataState { unknown, downloaded, downloading, notDownloaded }
 
@@ -41,6 +42,59 @@ class MapState extends State<Maps> {
   }
 
   bool _isPresent = true;
+
+  void _fetchRouteMap() async {
+    controller!.clearLines();
+    final location = aws_location.Location(
+        region: 'us-east-1',
+        endpointUrl: 'https://routes.geo.us-east-1.amazonaws.com',
+        credentials: aws_location.AwsClientCredentials(
+            accessKey: "AKIA6ODU7NUJVR6VAQ4Q",
+            secretKey: "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"));
+    final locationTry = location.calculateRoute(
+        travelMode: aws_location.TravelMode.car,
+        includeLegGeometry: true,
+        calculatorName: "saks-route-calculator-2",
+        departurePosition: [
+          -74.010934,
+          40.713359
+        ],
+        waypointPositions: [
+          [-73.959472, 40.817046]
+        ],
+        destinationPosition: [
+          -73.984852,
+          40.732349
+        ]);
+    locationTry.then((value) {
+      var routeList = value.toJson();
+      List<aws_location.Leg> legs = routeList['Legs'];
+      List<LineOptions> lineList = [];
+      for (var leg in legs) {
+        List<dynamic> lines = (leg.toJson()['Geometry'].toJson()['LineString']);
+        for (int i = 0; i < lines.length - 1; i++) {
+          LineOptions line =
+              LineOptions(lineColor: "#0000FF", lineWidth: 3, geometry: [
+            LatLng(lines[i][1], lines[i][0]),
+            LatLng(lines[i + 1][1], lines[i + 1][0]),
+          ]);
+          lineList.add(line);
+        }
+        // List<aws_location.Step> steps = leg.toJson()['Steps'];
+        // for (var step in steps) {
+        //   print(step.toJson());
+        //   LineOptions line =
+        //       LineOptions(lineColor: "#0000FF", lineWidth: 3, geometry: [
+        //     LatLng(step.endPosition[1], step.endPosition[0]),
+        //     LatLng(step.startPosition[1], step.startPosition[0])
+        //   ]);
+        //   controller!.addLines([line]);
+        // }
+      }
+        controller!.addLines(lineList);
+
+    });
+  }
 
   Future<void> _fetchData(String type) async {
     AuthSession res = await Amplify.Auth.fetchAuthSession(
@@ -147,7 +201,7 @@ class MapState extends State<Maps> {
               SpeedDialChild(
                 child: const Icon(Icons.wc_rounded, color: Colors.white),
                 backgroundColor: Colors.green,
-                onTap: () => print('Pressed Restrooms'),
+                onTap: () => _fetchRouteMap(),
                 label: 'Restrooms',
                 labelStyle: const TextStyle(
                     fontWeight: FontWeight.w500, color: Colors.white),
