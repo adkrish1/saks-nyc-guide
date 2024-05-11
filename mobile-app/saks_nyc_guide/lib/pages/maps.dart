@@ -12,7 +12,7 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
 const apiKey =
-    "v1.public.eyJqdGkiOiIwMTZiOTlhYS01NWJhLTQ0OGQtODAxYy1lMjYxMmMzMzY2YTkifTg4rxHJFQ1Sgbe7o0XHzJwWCqD86oR0rO1MjPjh6XiTOmKUwvXIw66TUxmm80LnQW7zjUqHpbSBXbLr2NCMFNbRPinK3E3INt1lrx0y_fS0ZLgq8jxbvtcEc2MsdY86MbiIVQc1U69_gOOnetIglMofkbXItmVauaUZ9kQ7mo4XCm6G5y3I11hzpvIpdEUqk9jrEF-xGbcVZ_Na9ulbmINfr9q-WTBcLh2pArIi-ghYafPytwB0PpXsFJAMN5hKyyp7dvHrCOVCg9ltadUxCbvCImHz0OmMw8CsWTt8zbXRvmcW4X8VVIZpxM7PmijZQtD_yB5PuHWrp8iiQrZ7KlE.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx";
+    "v1.public.eyJqdGkiOiJhZWZjNTBhZC0xZWYzLTQwNjItYmE4Zi1kMDdmZjE2YTlmNDYifTc9rXnLgDt7iwHSnuW4-jpUKi5le1OALtiZVKmpOmsrpINiWzQwIoyHeymAvsYmqWoRXkTZQnOOoUEE9VA8etS1WRVXfyTFHhX17XNXKbWp2DoTabdAhEq6AJ3RrAMsXfNZrM0QQlFTvBcepwV9CH2mU3q8vHSm10TyS7ThOAZtAmBckpyR55R0D4ae90chKbClyGubPcq52ixMjm-q21Cvgv5RjjkK1EzzUKXG3lH0AtmwnY1mTG1Dmlf4ZNSxBfGGuihdpkgQNCT0hoIAR7vkKQdbrAFOieyzOOnmYUo4Tz52gk5IGSxAztWAw6YaUPPkHgg_ElbePzorNo46I_g.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx";
 const mapName = "map-try-2";
 const region = "us-east-1";
 // enum OfflineDataState { unknown, downloaded, downloading, notDownloaded }
