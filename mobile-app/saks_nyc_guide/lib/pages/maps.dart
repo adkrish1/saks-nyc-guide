@@ -222,6 +222,17 @@ class MapState extends State<Maps> {
                 shape: const CircleBorder(),
               ),
               SpeedDialChild(
+                child: const Icon(Icons.pedal_bike_outlined,
+                    color: Colors.white),
+                backgroundColor: Colors.green,
+                onTap: () => _fetchData("Citibike"),
+                label: 'CitiBike',
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.white),
+                labelBackgroundColor: Colors.black,
+                shape: const CircleBorder(),
+              ),
+              SpeedDialChild(
                 child: const Icon(Icons.train_outlined, color: Colors.white),
                 backgroundColor: Colors.green,
                 onTap: () => _fetchData("Subway"),
