@@ -21,7 +21,8 @@ class ChatBotPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatBotPage> {
   List<types.Message> _messages = [];
-  final String _moveToItinerary = "Your itinerary has been created. Click this bubble to go to the itinerary page.";
+  final String _moveToItinerary =
+      "Your itinerary has been created. Click this bubble to go to the itinerary page.";
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
   );
@@ -88,6 +89,11 @@ class _ChatPageState extends State<ChatBotPage> {
       // If the server returns a 200 OK response, parse the JSON
       // You can handle the response data here as needed
       try {
+        final db = await openDatabase(
+          join(await getDatabasesPath(), 'messages_database.db'),
+        );
+        await db.execute("DELETE FROM attractions");
+
         // Parse the JSON response
         final Map<String, dynamic> parsedResponse = jsonDecode(response.body);
 
@@ -157,6 +163,16 @@ class _ChatPageState extends State<ChatBotPage> {
             );
             attractionList.add(attr);
           }
+
+          attractionList.sort((a, b) {
+            int latComparison =
+                a.toMap()['latitude'].compareTo(b.toMap()['latitude']);
+            if (latComparison != 0) {
+              return latComparison;
+            } else {
+              return a.toMap()['longitude'].compareTo(b.toMap()['longitude']);
+            }
+          });
 
           for (Attraction attraction in attractionList) {
             await database.then((d) {
