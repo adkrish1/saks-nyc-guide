@@ -41,6 +41,8 @@ class MapState extends State<Maps> {
     this.controller = controller;
   }
 
+  List<SymbolOptions> _markers = [];
+
   bool _isPresent = true;
 
   void _fetchRouteMap() async {
@@ -91,8 +93,7 @@ class MapState extends State<Maps> {
         //   controller!.addLines([line]);
         // }
       }
-        controller!.addLines(lineList);
-
+      controller!.addLines(lineList);
     });
   }
 
@@ -115,11 +116,12 @@ class MapState extends State<Maps> {
         // Parse the JSON response
         List<dynamic> res = jsonDecode(response.body);
         for (var element in res) {
-          _addCustomMarker(
+          _markers.add(_getSymbolOptions(
               "locationPin",
               LatLng(double.parse(element['Latitude']),
-                  double.parse(element['Longitude'])));
+                  double.parse(element['Longitude']))));
         }
+        controller!.addSymbols(_markers);
       } catch (e) {
         print('Error: $e');
       }
