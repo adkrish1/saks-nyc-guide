@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../utils/database_util.dart';
 
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -34,35 +35,7 @@ class _ChatPageState extends State<ChatBotPage> {
   dynamic database;
 
   Future<void> createDB() async {
-    database = openDatabase(
-      join(await getDatabasesPath(), 'messages_database.db'),
-      onCreate: (db, version) async {
-        db.execute(
-            'CREATE TABLE messages(id STRING PRIMARY KEY, messageText TEXT, createdAt INTEGER, author STRING)');
-        db.execute(
-          '''CREATE TABLE attractions (
-              id INTEGER PRIMARY KEY,
-              name TEXT,
-              address TEXT,
-              phone TEXT,
-              rating REAL,
-              price TEXT,
-              categories TEXT,
-              latitude REAL,
-              longitude REAL,
-              monday TEXT,
-              tuesday TEXT,
-              wednesday TEXT,
-              thursday TEXT,
-              friday TEXT,
-              saturday TEXT,
-              sunday TEXT
-            );
-          ''',
-        );
-      },
-      version: 1,
-    );
+    database = MyDatabaseUtils.createDB();
   }
 
   Future<void> _fetchData(message) async {

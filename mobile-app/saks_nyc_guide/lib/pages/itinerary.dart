@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import '../utils/database_util.dart';
 
 class Itinerary extends StatefulWidget {
   const Itinerary({Key? key}) : super(key: key);
@@ -25,35 +26,7 @@ class ItineraryState extends State<Itinerary> {
     Colors.pink
   ];
   Future<void> createDB() async {
-    database = openDatabase(
-      join(await getDatabasesPath(), 'messages_database.db'),
-      onCreate: (db, version) async {
-        db.execute(
-            'CREATE TABLE messages(id STRING PRIMARY KEY, messageText TEXT, createdAt INTEGER, author STRING)');
-        db.execute(
-          '''CREATE TABLE attractions (
-              id INTEGER PRIMARY KEY,
-              name TEXT,
-              address TEXT,
-              phone TEXT,
-              rating REAL,
-              price TEXT,
-              categories TEXT,
-              latitude REAL,
-              longitude REAL,
-              monday TEXT,
-              tuesday TEXT,
-              wednesday TEXT,
-              thursday TEXT,
-              friday TEXT,
-              saturday TEXT,
-              sunday TEXT
-            );
-          ''',
-        );
-      },
-      version: 1,
-    );
+    database = MyDatabaseUtils.createDB();
   }
 
   @override
