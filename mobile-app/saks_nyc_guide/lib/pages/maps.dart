@@ -152,7 +152,7 @@ class MapState extends State<Maps> {
     addImageFromAsset("Citibike", "assets/icons/Citibike.png");
     addImageFromAsset("currentLocation", "assets/icons/current_location.png");
     addImageFromAsset("Precinct", "assets/icons/Precinct.png");
-    addImageFromAsset("Restroom", "assets/icons/Restroom.png");
+    addImageFromAsset("Bathroom", "assets/icons/Restroom.png");
     addImageFromAsset("Subway", "assets/icons/Subway.png");
   }
 
@@ -207,7 +207,7 @@ class MapState extends State<Maps> {
               SpeedDialChild(
                 child: const Icon(Icons.wc_rounded, color: Colors.white),
                 backgroundColor: Colors.green,
-                onTap: () => _fetchRouteMap(),
+                onTap: () => _fetchData("Bathroom"),
                 label: 'Restrooms',
                 labelStyle: const TextStyle(
                     fontWeight: FontWeight.w500, color: Colors.white),
