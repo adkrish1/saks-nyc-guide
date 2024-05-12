@@ -17,7 +17,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedPageNumber = 0;
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
       _selectedPageNumber = index;
     });
@@ -33,12 +33,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // _counter++;
     // });
   }
-  final _pageOptions = [
-    const MapsPage(),
-    const Itinerary(),
-    const ChatBotPage(),
-    SettingsPage()
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +42,13 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    
+    final _pageOptions = [
+      const MapsPage(),
+      const Itinerary(),
+      ChatBotPage(callback: onItemTapped),
+      SettingsPage()
+    ];
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -78,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           currentIndex: _selectedPageNumber,
           selectedItemColor: Colors.deepPurpleAccent,
           unselectedItemColor: Colors.white,
-          onTap: _onItemTapped,
+          onTap: onItemTapped,
         ));
   }
 }

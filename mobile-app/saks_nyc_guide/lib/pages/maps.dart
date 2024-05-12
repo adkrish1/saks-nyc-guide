@@ -104,22 +104,21 @@ class MapState extends State<Maps> {
     final idToken = (res as CognitoAuthSession).userPoolTokens!.idToken;
 
     controller!.clearSymbols();
-
+    _markers.clear();
     final Uri uri = Uri.parse(
-        'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v2/location_data?location_type=${type}');
+        'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v3/location_data?location_type=${type}');
 
     final http.Response response =
         await http.get(uri, headers: {"Authorization": idToken.raw});
 
     if (response.statusCode == 200) {
       try {
-        // Parse the JSON response
         List<dynamic> res = jsonDecode(response.body);
         for (var element in res) {
           _markers.add(_getSymbolOptions(
               type,
-              LatLng(double.parse(element['Latitude']),
-                  double.parse(element['Longitude']))));
+              LatLng(element['Latitude'],
+                  element['Longitude'])));
         }
         controller!.addSymbols(_markers);
       } catch (e) {
@@ -167,7 +166,7 @@ class MapState extends State<Maps> {
     LatLng geometry = latLng;
     return SymbolOptions(
       geometry: geometry,
-      iconSize: 0.15,
+      iconSize: 0.4,
       // textField: 'Roboto',
       // textOffset: const Offset(0, 0.8),
       iconImage: iconImage,

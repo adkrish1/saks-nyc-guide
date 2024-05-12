@@ -11,7 +11,9 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class ChatBotPage extends StatefulWidget {
-  const ChatBotPage({super.key});
+
+  Function callback;
+  ChatBotPage({super.key, required this.callback});
 
   @override
   State<ChatBotPage> createState() => _ChatPageState();
@@ -163,10 +165,24 @@ class _ChatPageState extends State<ChatBotPage> {
     });
   }
 
+  void _goToItineraryPage(BuildContext context, types.Message m) async {
+    try {
+      String message = m.toJson()["text"];
+      print(message);
+      if(message.contains("go to")) {
+        widget.callback(1);
+      }
+    }
+    catch (e) {
+      print(e);
+    }
+  }
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Chat(
           messages: _messages,
+          onMessageLongPress: _goToItineraryPage,
+          onMessageTap: _goToItineraryPage,
           onSendPressed: _handleSendPressed,
           user: _user,
           theme: const DefaultChatTheme(
