@@ -21,7 +21,7 @@ class ItineraryState extends State<Itinerary> {
     Colors.teal,
     Colors.deepPurple,
     Colors.lightBlue,
-    Colors.amber,
+    Colors.deepOrange,
     Colors.pink
   ];
   Future<void> createDB() async {
@@ -76,6 +76,14 @@ class ItineraryState extends State<Itinerary> {
     });
   }
 
+  Icon _itemIcon(Map<String, dynamic> item) {
+    if (item['categories'].contains("Museums") ||
+        item['categories'].contains('Historical')) {
+      return const Icon(Icons.history_edu_outlined, size: 36);
+    }
+    return const Icon(Icons.restaurant_menu_outlined, size: 36);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,10 +106,7 @@ class ItineraryState extends State<Itinerary> {
                     ),
                   ),
                   child: ListTile(
-                    leading: Icon(
-                      item['icon'],
-                      size: 36,
-                    ),
+                    leading: _itemIcon(item),
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -109,7 +114,7 @@ class ItineraryState extends State<Itinerary> {
                             child: Text(item['name'],
                                 overflow: TextOverflow.ellipsis)),
                         Text(
-                          item['price'].toString(),
+                          item['price'] == "--" ? "" : item['price'].contains("No") ? "" : item['price'].toString(),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -120,7 +125,7 @@ class ItineraryState extends State<Itinerary> {
                         Text('Address: ${item['address']}'),
                         Text('Rating: ${item['rating']}'),
                         Text('Phone: ${item['phone']}'),
-                        Text('Categories: ${item['categories']}'),
+                        // Text('Categories: ${item['categories']}'),
                       ],
                     ),
                   ),
