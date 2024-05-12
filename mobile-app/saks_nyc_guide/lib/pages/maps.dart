@@ -9,6 +9,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:aws_client/location_2020_11_19.dart' as aws_location;
+import '../utils/database_util.dart';
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
@@ -43,10 +44,48 @@ class MapState extends State<Maps> {
 
   List<SymbolOptions> _markers = [];
 
+  List<Map<String, dynamic>> items = [];
   bool _isPresent = true;
+  dynamic database;
 
-  void _fetchRouteMap() async {
+  Future<void> createDB() async {
+    database = MyDatabaseUtils.createDB();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    createDB().then((value) => _loadMessages());
+  }
+
+  void _loadMessages() async {
+    await database.then((d) {
+      List<Map<String, dynamic>> attractionList = [];
+      d.query('attractions').then((messagesMap) {
+        for (Map<String, dynamic> attraction in messagesMap) {
+          attractionList.add(attraction);
+        }
+        setState(() {
+          items = attractionList;
+        });
+      });
+    });
+  }
+
+  void _fetchRouteMap(itemList) async {
+    List<List<double>> latLngList = [];
+    _markers.clear();
+
+    for (dynamic item in itemList) {
+      _markers.add(_getSymbolOptions(
+          item['categories'].contains("Museums") ||
+          item['categories'].contains('Historical') ? "Citibike" : "Bathroom", LatLng(item['latitude'], item['longitude'])));
+      latLngList.add([item['longitude'], item['latitude']]);
+    }
+
     controller!.clearLines();
+    controller!.clearSymbols();
+    controller!.addSymbols(_markers);
     final location = aws_location.Location(
         region: 'us-east-1',
         endpointUrl: 'https://routes.geo.us-east-1.amazonaws.com',
@@ -57,17 +96,9 @@ class MapState extends State<Maps> {
         travelMode: aws_location.TravelMode.car,
         includeLegGeometry: true,
         calculatorName: "saks-route-calculator-2",
-        departurePosition: [
-          -74.010934,
-          40.713359
-        ],
-        waypointPositions: [
-          [-73.959472, 40.817046]
-        ],
-        destinationPosition: [
-          -73.984852,
-          40.732349
-        ]);
+        departurePosition: latLngList[0],
+        waypointPositions: latLngList.sublist(1, latLngList.length - 1),
+        destinationPosition: latLngList[latLngList.length - 1]);
     locationTry.then((value) {
       var routeList = value.toJson();
       List<aws_location.Leg> legs = routeList['Legs'];
@@ -104,6 +135,7 @@ class MapState extends State<Maps> {
     final idToken = (res as CognitoAuthSession).userPoolTokens!.idToken;
 
     controller!.clearSymbols();
+    controller!.clearLines();
     _markers.clear();
     final Uri uri = Uri.parse(
         'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/v3/location_data?location_type=${type}');
@@ -116,9 +148,7 @@ class MapState extends State<Maps> {
         List<dynamic> res = jsonDecode(response.body);
         for (var element in res) {
           _markers.add(_getSymbolOptions(
-              type,
-              LatLng(element['Latitude'],
-                  element['Longitude'])));
+              type, LatLng(element['Latitude'], element['Longitude'])));
         }
         controller!.addSymbols(_markers);
       } catch (e) {
@@ -187,7 +217,7 @@ class MapState extends State<Maps> {
               zoom: 12.25,
               bearing: 28.5),
           dragEnabled: false,
-          zoomGesturesEnabled: false,
+          zoomGesturesEnabled: true,
           rotateGesturesEnabled: false,
           compassEnabled: false,
           cameraTargetBounds: CameraTargetBounds(LatLngBounds(
@@ -226,8 +256,8 @@ class MapState extends State<Maps> {
                 shape: const CircleBorder(),
               ),
               SpeedDialChild(
-                child: const Icon(Icons.pedal_bike_outlined,
-                    color: Colors.white),
+                child:
+                    const Icon(Icons.pedal_bike_outlined, color: Colors.white),
                 backgroundColor: Colors.green,
                 onTap: () => _fetchData("Citibike"),
                 label: 'CitiBike',
@@ -241,6 +271,17 @@ class MapState extends State<Maps> {
                 backgroundColor: Colors.green,
                 onTap: () => _fetchData("Subway"),
                 label: 'Subway',
+                labelStyle: const TextStyle(
+                    fontWeight: FontWeight.w500, color: Colors.white),
+                labelBackgroundColor: Colors.black,
+                shape: const CircleBorder(),
+              ),
+              SpeedDialChild(
+                child:
+                    const Icon(Icons.checklist_outlined, color: Colors.white),
+                backgroundColor: Colors.green,
+                onTap: () => _fetchRouteMap(items),
+                label: 'Itinerary',
                 labelStyle: const TextStyle(
                     fontWeight: FontWeight.w500, color: Colors.white),
                 labelBackgroundColor: Colors.black,
