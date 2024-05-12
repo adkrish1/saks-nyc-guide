@@ -117,7 +117,7 @@ class MapState extends State<Maps> {
         List<dynamic> res = jsonDecode(response.body);
         for (var element in res) {
           _markers.add(_getSymbolOptions(
-              "locationPin",
+              type,
               LatLng(double.parse(element['Latitude']),
                   double.parse(element['Longitude']))));
         }
@@ -150,6 +150,11 @@ class MapState extends State<Maps> {
 
   void _onStyleLoaded() {
     addImageFromAsset("locationPin", "assets/icons/location.png");
+    addImageFromAsset("Citibike", "assets/icons/Citibike.png");
+    addImageFromAsset("currentLocation", "assets/icons/current_location.png");
+    addImageFromAsset("Precinct", "assets/icons/Precinct.png");
+    addImageFromAsset("Restroom", "assets/icons/Restroom.png");
+    addImageFromAsset("Subway", "assets/icons/Subway.png");
   }
 
   Future<void> addImageFromAsset(String name, String assetName) async {
@@ -162,7 +167,7 @@ class MapState extends State<Maps> {
     LatLng geometry = latLng;
     return SymbolOptions(
       geometry: geometry,
-      iconSize: 4.0,
+      iconSize: 0.15,
       // textField: 'Roboto',
       // textOffset: const Offset(0, 0.8),
       iconImage: iconImage,
