@@ -49,6 +49,7 @@ class Attraction {
       'address': address,
       'phone': phone,
       'rating': rating,
+      'price': price,
       'categories': categories,
       'latitude': latitude,
       'longitude': longitude,

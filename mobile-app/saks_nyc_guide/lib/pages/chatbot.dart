@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:saks_nyc_guide/utils/messages_util.dart';
+import 'package:saks_nyc_guide/utils/iterinary_util.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -34,9 +35,29 @@ class _ChatPageState extends State<ChatBotPage> {
   Future<void> createDB() async {
     database = openDatabase(
       join(await getDatabasesPath(), 'messages_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          'CREATE TABLE messages(id STRING PRIMARY KEY, messageText TEXT, createdAt INTEGER, author STRING)',
+      onCreate: (db, version) async {
+        db.execute(
+            'CREATE TABLE messages(id STRING PRIMARY KEY, messageText TEXT, createdAt INTEGER, author STRING)');
+        db.execute(
+          '''CREATE TABLE attractions (
+              id INTEGER PRIMARY KEY,
+              name TEXT,
+              address TEXT,
+              phone TEXT,
+              rating REAL,
+              price TEXT,
+              categories TEXT,
+              latitude REAL,
+              longitude REAL,
+              monday TEXT,
+              tuesday TEXT,
+              wednesday TEXT,
+              thursday TEXT,
+              friday TEXT,
+              saturday TEXT,
+              sunday TEXT
+            );
+          ''',
         );
       },
       version: 1,
@@ -74,28 +95,97 @@ class _ChatPageState extends State<ChatBotPage> {
         final String messagesContent =
             parsedResponse['body-json']['messages'][0]['content'];
 
-        // Print the value
-        print(messagesContent); // Output: Please enter a valid input
-        final textMessage = types.TextMessage(
-          author: _bot,
-          createdAt: DateTime.now().millisecondsSinceEpoch,
-          id: const Uuid().v4(),
-          text: messagesContent,
-        );
-        setState(() {
-          _messages.insert(0, textMessage);
-        });
+        if (parsedResponse['body-json']['isDataExist'] == true) {
+          List<dynamic> attractionsData =
+              parsedResponse['body-json']['data']['response']['attractions'];
 
-        await database.then((d) {
-          d.insert(
-              "messages",
-              ChatMessage(
-                      author: _bot,
-                      createdAt: textMessage.createdAt,
-                      id: textMessage.id,
-                      messageText: textMessage.text)
-                  .toMap());
-        });
+          List<dynamic> restaurantData =
+              parsedResponse['body-json']['data']['response']['restaurants'];
+
+          List<Attraction> attractionList = [];
+
+          for (var attraction in attractionsData) {
+            Attraction attr = Attraction(
+              name: attraction["Name"],
+              address: attraction["Address"] ?? "--",
+              phone: attraction["Phone"] ?? "--",
+              rating: attraction["Rating"] == null
+                  ? "--"
+                  : attraction["Rating"].toString(),
+              categories: attraction["Categories"] ?? "--",
+              price: attraction["Price Range"] == null
+                  ? "--"
+                  : attraction['Price Range'],
+              latitude: attraction["Latitude"],
+              longitude: attraction["Longitude"],
+              openingHours: {
+                'Monday': attraction['Monday'] ?? "--",
+                'Tuesday': attraction['Tuesday'] ?? "--",
+                'Wednesday': attraction['Wednesday'] ?? "--",
+                'Thursday': attraction['Thursday'] ?? "--",
+                'Friday': attraction['Friday'] ?? "--",
+                'Saturday': attraction['Saturday'] ?? "--",
+                'Sunday': attraction['Sunday'] ?? "--"
+              },
+            );
+            attractionList.add(attr);
+          }
+
+          for (var restaurant in restaurantData) {
+            Attraction attr = Attraction(
+              name: restaurant["Name"],
+              address: restaurant["Address"] ?? "--",
+              phone: restaurant["Phone"] ?? "--",
+              rating: restaurant["Rating"] == null
+                  ? "--"
+                  : restaurant["Rating"].toString(),
+              categories: restaurant["Categories"] ?? "--",
+              price: restaurant["Price Range"] == null
+                  ? "--"
+                  : restaurant['Price Range'],
+              latitude: restaurant["Latitude"],
+              longitude: restaurant["Longitude"],
+              openingHours: {
+                'Monday': restaurant['Monday'] ?? "--",
+                'Tuesday': restaurant['Tuesday'] ?? "--",
+                'Wednesday': restaurant['Wednesday'] ?? "--",
+                'Thursday': restaurant['Thursday'] ?? "--",
+                'Friday': restaurant['Friday'] ?? "--",
+                'Saturday': restaurant['Saturday'] ?? "--",
+                'Sunday': restaurant['Sunday'] ?? "--"
+              },
+            );
+            attractionList.add(attr);
+          }
+
+          for (Attraction attraction in attractionList) {
+            await database.then((d) {
+              d.insert("attractions", attraction.toMap());
+            });
+          }
+        } else {
+          print(messagesContent); // Output: Please enter a valid input
+          final textMessage = types.TextMessage(
+            author: _bot,
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            id: const Uuid().v4(),
+            text: messagesContent,
+          );
+          setState(() {
+            _messages.insert(0, textMessage);
+          });
+
+          await database.then((d) {
+            d.insert(
+                "messages",
+                ChatMessage(
+                        author: _bot,
+                        createdAt: textMessage.createdAt,
+                        id: textMessage.id,
+                        messageText: textMessage.text)
+                    .toMap());
+          });
+        }
       } catch (e) {
         // Handle exceptions
         print('Error: $e');
@@ -103,6 +193,7 @@ class _ChatPageState extends State<ChatBotPage> {
     } else {
       // If the server did not return a 200 OK response,
       // throw an exception.
+      print(response.statusCode);
       throw Exception('Failed to load data');
     }
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Itinerary extends StatefulWidget {
   const Itinerary({Key? key}) : super(key: key);
@@ -8,98 +10,71 @@ class Itinerary extends StatefulWidget {
 }
 
 class ItineraryState extends State<Itinerary> {
-  final List<Map<String, dynamic>> items = [
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant A',
-      'address': '123 Main St',
-      'rating': 4.5,
-      'phone': '555-1234',
-      'categories': 'Italian, Pizza',
-      'color': Colors.blue,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant B',
-      'address': '456 Elm St',
-      'rating': 4.2,
-      'phone': '555-5678',
-      'categories': 'Mexican',
-      'color': Colors.green,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant C',
-      'address': '789 Oak St',
-      'rating': 4.0,
-      'phone': '555-9876',
-      'categories': 'Chinese',
-      'color': Colors.red,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant D',
-      'address': '321 Pine St',
-      'rating': 4.7,
-      'phone': '555-5432',
-      'categories': 'American',
-      'color': Colors.orange,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant E',
-      'address': '654 Maple St',
-      'rating': 4.3,
-      'phone': '555-6789',
-      'categories': 'Japanese, Sushi',
-      'color': Colors.purple,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant F',
-      'address': '987 Cedar St',
-      'rating': 4.6,
-      'phone': '555-3456',
-      'categories': 'Indian',
-      'color': Colors.teal,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant G',
-      'address': '159 Walnut St',
-      'rating': 4.1,
-      'phone': '555-8765',
-      'categories': 'Thai',
-      'color': Colors.deepPurple,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant H',
-      'address': '753 Elmwood St',
-      'rating': 4.4,
-      'phone': '555-4321',
-      'categories': 'Mediterranean',
-      'color': Colors.lightBlue,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant I',
-      'address': '246 Birch St',
-      'rating': 4.8,
-      'phone': '555-2109',
-      'categories': 'Seafood',
-      'color': Colors.amber,
-    },
-    {
-      'icon': Icons.restaurant_sharp,
-      'name': 'Restaurant J',
-      'address': '369 Pineapple St',
-      'rating': 4.9,
-      'phone': '555-7890',
-      'categories': 'Greek',
-      'color': Colors.pink,
-    },
+  List<Map<String, dynamic>> items = [];
+  dynamic database;
+  final List<dynamic> colors = [
+    Colors.blue,
+    Colors.green,
+    Colors.red,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.deepPurple,
+    Colors.lightBlue,
+    Colors.amber,
+    Colors.pink
   ];
+  Future<void> createDB() async {
+    database = openDatabase(
+      join(await getDatabasesPath(), 'messages_database.db'),
+      onCreate: (db, version) async {
+        db.execute(
+            'CREATE TABLE messages(id STRING PRIMARY KEY, messageText TEXT, createdAt INTEGER, author STRING)');
+        db.execute(
+          '''CREATE TABLE attractions (
+              id INTEGER PRIMARY KEY,
+              name TEXT,
+              address TEXT,
+              phone TEXT,
+              rating REAL,
+              price TEXT,
+              categories TEXT,
+              latitude REAL,
+              longitude REAL,
+              monday TEXT,
+              tuesday TEXT,
+              wednesday TEXT,
+              thursday TEXT,
+              friday TEXT,
+              saturday TEXT,
+              sunday TEXT
+            );
+          ''',
+        );
+      },
+      version: 1,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    createDB().then((value) => _loadMessages());
+  }
+
+  void _loadMessages() async {
+    await database.then((d) {
+      List<Map<String, dynamic>> attractionList = [];
+      d.query('attractions').then((messagesMap) {
+        for (Map<String, dynamic> attraction in messagesMap) {
+          attractionList.add(attraction);
+        }
+      });
+      setState(() {
+        items = attractionList;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +88,7 @@ class ItineraryState extends State<Itinerary> {
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Card(
-                  color: item['color'], // Unique color for each card
+                  color: colors[item['id'] % 10], // Unique color for each card
                   shape: RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.circular(10.0), // Apply border radius
@@ -130,9 +105,11 @@ class ItineraryState extends State<Itinerary> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(item['name']),
+                        Expanded(
+                            child: Text(item['name'],
+                                overflow: TextOverflow.ellipsis)),
                         Text(
-                          item['rating'].toString(),
+                          item['price'].toString(),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
