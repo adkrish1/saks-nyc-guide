@@ -69,9 +69,9 @@ class ItineraryState extends State<Itinerary> {
         for (Map<String, dynamic> attraction in messagesMap) {
           attractionList.add(attraction);
         }
-      });
-      setState(() {
-        items = attractionList;
+        setState(() {
+          items = attractionList;
+        });
       });
     });
   }

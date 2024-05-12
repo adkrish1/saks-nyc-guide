@@ -41,7 +41,7 @@ class SettingsPage extends StatelessWidget {
         ),
         const ListTile(
           title: Text('Clear Iterinary'),
-          onTap: clearChats,
+          onTap: clearItinerary,
           dense: true,
         ),
         ListTile(

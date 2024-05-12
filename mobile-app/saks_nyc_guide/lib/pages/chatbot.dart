@@ -21,7 +21,7 @@ class ChatBotPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatBotPage> {
   List<types.Message> _messages = [];
-  final String _moveToItinerary = "Please";
+  final String _moveToItinerary = "Your itinerary has been created. Click this bubble to go to the itinerary page.";
   final _user = const types.User(
     id: '82091008-a484-4a89-ae75-a22bf8d6f3ac',
   );
@@ -163,6 +163,28 @@ class _ChatPageState extends State<ChatBotPage> {
               d.insert("attractions", attraction.toMap());
             });
           }
+
+          final goToItineraryMessage = types.TextMessage(
+            author: _bot,
+            createdAt: DateTime.now().millisecondsSinceEpoch,
+            id: const Uuid().v4(),
+            text: _moveToItinerary,
+          );
+
+          setState(() {
+            _messages.insert(0, goToItineraryMessage);
+          });
+
+          await database.then((d) {
+            d.insert(
+                "messages",
+                ChatMessage(
+                        author: _bot,
+                        createdAt: goToItineraryMessage.createdAt,
+                        id: goToItineraryMessage.id,
+                        messageText: goToItineraryMessage.text)
+                    .toMap());
+          });
         } else {
           print(messagesContent); // Output: Please enter a valid input
           final textMessage = types.TextMessage(
@@ -259,7 +281,6 @@ class _ChatPageState extends State<ChatBotPage> {
   void _goToItineraryPage(BuildContext context, types.Message m) async {
     try {
       String message = m.toJson()["text"];
-      print(message);
       if (message.contains(_moveToItinerary)) {
         widget.callback(1);
       }
