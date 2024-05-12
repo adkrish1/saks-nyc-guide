@@ -39,6 +39,11 @@ class SettingsPage extends StatelessWidget {
           onTap: clearChats,
           dense: true,
         ),
+        const ListTile(
+          title: Text('Clear Iterinary'),
+          onTap: clearChats,
+          dense: true,
+        ),
         ListTile(
           title: const Text('Logout'),
           onTap: signOutCurrentUser,
@@ -54,4 +59,11 @@ void clearChats() async {
     join(await getDatabasesPath(), 'messages_database.db'),
   );
   await db.execute("DELETE FROM messages");
+}
+
+void clearItinerary() async {
+  final db = await openDatabase(
+    join(await getDatabasesPath(), 'messages_database.db'),
+  );
+  await db.execute("DELETE FROM attractions");
 }
