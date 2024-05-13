@@ -89,8 +89,8 @@ class MapState extends State<Maps> {
       _markers.add(_getSymbolOptions(
           item['categories'].contains("Museums") ||
                   item['categories'].contains('Historical')
-              ? "Citibike"
-              : "Bathroom",
+              ? "Historic"
+              : "Restaurants",
           LatLng(item['latitude'], item['longitude'])));
       latLngList.add([item['longitude'], item['latitude']]);
     }
@@ -196,6 +196,8 @@ class MapState extends State<Maps> {
     addImageFromAsset("Precinct", "assets/icons/Precinct.png");
     addImageFromAsset("Bathroom", "assets/icons/Restroom.png");
     addImageFromAsset("Subway", "assets/icons/Subway.png");
+    addImageFromAsset("Restaurants", "assets/icons/Restaurants.png");
+    addImageFromAsset("Historic", "assets/icons/Historic.png");
   }
 
   Future<void> addImageFromAsset(String name, String assetName) async {

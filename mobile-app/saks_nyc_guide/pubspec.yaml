@@ -85,6 +85,8 @@ flutter:
     - assets/icons/Precinct.png
     - assets/icons/Restroom.png
     - assets/icons/Subway.png
+    - assets/icons/Historic.png
+    - assets/icons/Restaurants.png
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
