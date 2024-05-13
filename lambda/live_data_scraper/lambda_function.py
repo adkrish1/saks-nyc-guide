@@ -86,7 +86,7 @@ def get_sightseeing_data(api_key, cursor, connection, total=5, start_offset=0):
         cursor.execute(sql_query, params)
         connection.commit()
                     
-def lambda_handler():
+def lambda_handler(event, context):
     connection = pymysql.connect(host=rds_proxy_host, user=user_name, passwd=password, db=db_name, connect_timeout=5)
     
     cursor = connection.cursor()
