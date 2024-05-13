@@ -41,7 +41,7 @@ class _ChatPageState extends State<ChatBotPage> {
   Future<void> _fetchData(message) async {
     print("Message is: " + message);
     final Uri uri = Uri.parse(
-        'https://u9rvp4d6qi.execute-api.us-east-1.amazonaws.com/beta/chatbot');
+        'http://llm-load-balancer-1191179151.us-east-1.elb.amazonaws.com/');
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
       // Add any additional headers if needed
@@ -52,11 +52,16 @@ class _ChatPageState extends State<ChatBotPage> {
       ]
     };
 
-    final http.Response response = await http.post(
+    final http.Response response = await http
+        .post(
       uri,
       headers: headers,
       body: jsonEncode(requestBody),
-    );
+    )
+        .timeout(const Duration(minutes: 2), onTimeout: () {
+      return http.Response(
+          'Error', 408); // Request Timeout response status code
+    });
 
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON
@@ -71,15 +76,13 @@ class _ChatPageState extends State<ChatBotPage> {
         final Map<String, dynamic> parsedResponse = jsonDecode(response.body);
 
         // Access the value of messages.content
-        final String messagesContent =
-            parsedResponse['body-json']['messages'][0]['content'];
 
-        if (parsedResponse['body-json']['isDataExist'] == true) {
+        if (parsedResponse['isDataExist'] == true) {
           List<dynamic> attractionsData =
-              parsedResponse['body-json']['data']['response']['attractions'];
+              parsedResponse['response']['attractions'];
 
           List<dynamic> restaurantData =
-              parsedResponse['body-json']['data']['response']['restaurants'];
+              parsedResponse['response']['restaurants'];
 
           List<Attraction> attractionList = [];
 
@@ -175,6 +178,7 @@ class _ChatPageState extends State<ChatBotPage> {
                     .toMap());
           });
         } else {
+          final String messagesContent = parsedResponse['messages'][0]['content'];
           print(messagesContent); // Output: Please enter a valid input
           final textMessage = types.TextMessage(
             author: _bot,
