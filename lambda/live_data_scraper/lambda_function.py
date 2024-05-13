@@ -9,7 +9,7 @@ import pymysql
 import json
 import os
 import json
-from pip._vendor import requests
+import requests
 import logging
 import time
 
@@ -49,7 +49,6 @@ def get_sightseeing_data(api_key, cursor, connection, total=5, start_offset=0):
     
     data = response.json()
     for business in data.get('businesses', []):
-        time.sleep(1)
         business_id = business['id']
         business_details_url = f"https://api.yelp.com/v3/businesses/{business_id}"
         details_response = requests.get(business_details_url, headers=headers)
@@ -97,6 +96,8 @@ def lambda_handler(event, context):
         rows = cursor.fetchall()
         
         get_sightseeing_data(api_key=api_key, cursor=cursor, connection=connection, start_offset=rows[0][0])
+        
+        print("Total row:", rows[0][0])
         
         return {
             'statusCode': 200,
