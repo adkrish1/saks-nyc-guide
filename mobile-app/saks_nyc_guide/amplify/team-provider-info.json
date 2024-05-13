@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-saksnycguide-dev-d638e-authRole",
+      "UnauthRoleArn": "arn:aws:iam::992382774547:role/amplify-saksnycguide-dev-d638e-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::992382774547:role/amplify-saksnycguide-dev-d638e-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-saksnycguide-dev-d638e-deployment",
+      "UnauthRoleName": "amplify-saksnycguide-dev-d638e-unauthRole",
+      "StackName": "amplify-saksnycguide-dev-d638e",
+      "StackId": "arn:aws:cloudformation:us-east-1:992382774547:stack/amplify-saksnycguide-dev-d638e/d3be2960-0822-11ef-82b9-0ef834721687",
+      "AmplifyAppId": "d15tu7ix54dtjx"
+    },
+    "categories": {
+      "auth": {
+        "saksnycguidef32df90c": {}
+      },
+      "api": {
+        "saksnycguide": {}
+      }
+    }
+  }
+}
