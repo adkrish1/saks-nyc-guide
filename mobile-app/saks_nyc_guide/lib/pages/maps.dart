@@ -10,6 +10,7 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:aws_client/location_2020_11_19.dart' as aws_location;
 import '../utils/database_util.dart';
+import 'package:geolocator/geolocator.dart';
 
 const styleString =
     "https://maps.geo.${region}.amazonaws.com/maps/v0/maps/${mapName}/style-descriptor?key=${apiKey}";
@@ -74,12 +75,23 @@ class MapState extends State<Maps> {
 
   void _fetchRouteMap(itemList) async {
     List<List<double>> latLngList = [];
+    Position position;
+    try {
+      position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      latLngList.add([position.longitude, position.latitude]);
+    } catch (e) {
+      print("Unable to fetch location");
+    }
     _markers.clear();
 
     for (dynamic item in itemList) {
       _markers.add(_getSymbolOptions(
           item['categories'].contains("Museums") ||
-          item['categories'].contains('Historical') ? "Citibike" : "Bathroom", LatLng(item['latitude'], item['longitude'])));
+                  item['categories'].contains('Historical')
+              ? "Citibike"
+              : "Bathroom",
+          LatLng(item['latitude'], item['longitude'])));
       latLngList.add([item['longitude'], item['latitude']]);
     }
 
