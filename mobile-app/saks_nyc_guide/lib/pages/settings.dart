@@ -16,6 +16,7 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> signOutCurrentUser() async {
     clearChats();
+    clearItinerary();
     final result = await Amplify.Auth.signOut();
     if (result is CognitoCompleteSignOut) {
       safePrint('Sign out completed successfully');
