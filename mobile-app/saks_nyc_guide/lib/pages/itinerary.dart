@@ -60,52 +60,62 @@ class ItineraryState extends State<Itinerary> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Card(
-                  color: colors[item['id'] % 10], // Unique color for each card
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Apply border radius
-                    side: const BorderSide(
-                      color: Colors.black, // Border color
-                      width: 1.0,
-                    ),
-                  ),
-                  child: ListTile(
-                    leading: _itemIcon(item),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                            child: Text(item['name'],
-                                overflow: TextOverflow.ellipsis)),
-                        Text(
-                          item['price'] == "--" ? "" : item['price'].contains("No") ? "" : item['price'].toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+      body: items.isNotEmpty
+          ? ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Card(
+                        color: colors[
+                            item['id'] % 10], // Unique color for each card
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              10.0), // Apply border radius
+                          side: const BorderSide(
+                            color: Colors.black, // Border color
+                            width: 1.0,
+                          ),
                         ),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Address: ${item['address']}'),
-                        Text('Rating: ${item['rating']}'),
-                        Text('Phone: ${item['phone']}'),
-                        // Text('Categories: ${item['categories']}'),
-                      ],
-                    ),
-                  ),
-                ),
-              ));
-        },
-      ),
+                        child: ListTile(
+                          leading: _itemIcon(item),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                  child: Text(item['name'],
+                                      overflow: TextOverflow.ellipsis)),
+                              Text(
+                                item['price'] == "--"
+                                    ? ""
+                                    : item['price'].contains("No")
+                                        ? ""
+                                        : item['price'].toString(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Address: ${item['address']}'),
+                              Text('Rating: ${item['rating']}'),
+                              Text('Phone: ${item['phone']}'),
+                              // Text('Categories: ${item['categories']}'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ));
+              },
+            )
+          : const Center(
+              child: Text("Use the chatbot to prepare your itinerary."),
+            ),
     );
   }
 }

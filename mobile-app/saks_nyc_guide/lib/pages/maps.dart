@@ -293,6 +293,7 @@ class MapState extends State<Maps> {
                     const Icon(Icons.checklist_outlined, color: Colors.white),
                 backgroundColor: Colors.green,
                 onTap: () => _fetchRouteMap(items),
+                visible: items.isNotEmpty,
                 label: 'Itinerary',
                 labelStyle: const TextStyle(
                     fontWeight: FontWeight.w500, color: Colors.white),
